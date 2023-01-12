@@ -6,6 +6,7 @@ from flask_restful_swagger_2 import Api
 from flask_cors import CORS
 
 from database.db import initialize_db
+from resources.routes import initialize_routes
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'cpf-secret-key'
@@ -20,3 +21,5 @@ cors = CORS(app, resources={r'/*': { 'origins': '*' }})
 
 # initialize database
 initialize_db(app)
+# initialize routes
+initialize_routes(app)
