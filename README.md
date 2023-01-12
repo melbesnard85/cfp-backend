@@ -4,7 +4,7 @@
 
 ### Create folder and activate it for packages
 ```
-python -m venv
+python -m venv venv
 venv\Scripts\activate
 ```
 
