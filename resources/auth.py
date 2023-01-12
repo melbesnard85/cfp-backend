@@ -1,0 +1,21 @@
+from flask import Blueprint, request, make_response, render_template, redirect, url_for
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, set_access_cookies, jwt_required
+from database.models import User
+import datetime
+
+auth = Blueprint('auth', __name__, template_folder='templates')
+
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        user = User(**request.form)
+        user.hash_password()
+        user.save()
+        accessToken = create_access_token(identity=str(user.id), expires_delta=datetime.timedelta(days=1))
+        resp = make_response(redirect(url_for('auth.dashboard'))) # Redirect to wherever after login
+        resp.set_cookie('access_token_cookie', accessToken, max_age=60*60*24) # Expires in 1 day
+        return resp
+    else:
+        if request.cookies.get('access_token_cookie'):
+            return redirect(url_for('auth.dashboard'))
+        return render_template('signup.html') # Our signup page
