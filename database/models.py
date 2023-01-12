@@ -12,3 +12,8 @@ class User(Document):
         self.password = generate_password_hash(self.password + self.salt).decode('utf8')
     def check_password(self, password):
         return check_password_hash(self.password, password + self.salt)
+    def serialize(self):
+        return {
+            'id': str(self.id),
+            'email': self.email,
+        }
