@@ -36,3 +36,20 @@ def login():
         if request.cookies.get('access_token_cookie'):
             return redirect(url_for('auth.dashboard'))
         return render_template('login.html') # Our login page
+
+@auth.after_app_request
+@jwt_required(optional=True)
+def refresh(response):
+    identity = get_jwt_identity()
+    if identity:
+        expTimestamp = get_jwt()['exp']
+        now = datetime.datetime.now()
+        targetTimestamp = datetime.datetime.timestamp(now + datetime.timedelta(minutes=30))
+        if targetTimestamp > expTimestamp:
+            accessToken = create_access_token(identity=identity, expires_delta=datetime.timedelta(days=1))
+            set_access_cookies(response, accessToken, max_age=60*60*24)
+    return response
+
+@auth.route('/dashboard', methods=['GET'])
+def dashboard():
+    return render_template('dashboard.html')
