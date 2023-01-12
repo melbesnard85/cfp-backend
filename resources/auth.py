@@ -19,3 +19,20 @@ def signup():
         if request.cookies.get('access_token_cookie'):
             return redirect(url_for('auth.dashboard'))
         return render_template('signup.html') # Our signup page
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        body = request.form
+        user = User.objects.get(email=body['email'])
+        authorized = user.check_password(body['password'])
+        if not authorized:
+            return render_template('login.html', failed=True) # Our login page
+        accessToken = create_access_token(identity=str(user.id), expires_delta=datetime.timedelta(days=1))
+        resp = make_response(redirect(url_for('auth.dashboard'))) # Redirect to wherever after login
+        resp.set_cookie('access_token_cookie', accessToken, max_age=60*60*24) # Expires in 1 day
+        return resp
+    else:
+        if request.cookies.get('access_token_cookie'):
+            return redirect(url_for('auth.dashboard'))
+        return render_template('login.html') # Our login page
