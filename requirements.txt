@@ -1,0 +1,6 @@
+Flask
+mongoengine
+flask-bcrypt
+flask-jwt-extended
+flask-restful-swagger-2
+flask-cors
